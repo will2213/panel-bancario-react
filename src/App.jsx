@@ -1,3 +1,4 @@
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -9,6 +10,14 @@ import {
   Stack,
   TextField,
   Button
+} from "@mui/material";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper
 } from "@mui/material";
 import { useState } from "react";
 import ListaClientes from "./components/ListaClientes";
@@ -92,29 +101,41 @@ function App() {
     {/* 📊 TARJETAS RESUMEN */}
     <Grid container spacing={2} sx={{ mt: 3 }}>
       <Grid item xs={12} md={6}>
-        <Card>
-          <CardContent>
-            <Typography variant="subtitle1">
-              Total clientes
-            </Typography>
-            <Typography variant="h4">
-              {clientes.length}
-            </Typography>
-          </CardContent>
-        </Card>
+       <Card
+  sx={{
+    borderRadius: 3,
+    boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+  }}
+>
+  <CardContent>
+    <Typography variant="subtitle2" color="text.secondary">
+      Total clientes
+    </Typography>
+
+    <Typography variant="h4" fontWeight="bold">
+      {clientes.length}
+    </Typography>
+  </CardContent>
+</Card>
       </Grid>
 
       <Grid item xs={12} md={6}>
-        <Card>
-          <CardContent>
-            <Typography variant="subtitle1">
-              Capital total
-            </Typography>
-            <Typography variant="h4">
-              ${clientes.reduce((acc, c) => acc + c.saldo, 0)}
-            </Typography>
-          </CardContent>
-        </Card>
+       <Card
+  sx={{
+    borderRadius: 3,
+    boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+  }}
+>
+  <CardContent>
+    <Typography variant="subtitle2" color="text.secondary">
+      Capital total
+    </Typography>
+
+    <Typography variant="h4" fontWeight="bold" color="primary">
+      ${clientes.reduce((acc, c) => acc + c.saldo, 0)}
+    </Typography>
+  </CardContent>
+</Card>
       </Grid>
     </Grid>
 
@@ -122,16 +143,31 @@ function App() {
     <Typography variant="h5" sx={{ mt: 4 }}>
       Historial de movimientos
     </Typography>
+<Paper sx={{ mt: 4 }}>
+  <Table>
+    <TableHead>
+      <TableRow>
+        <TableCell>Cliente</TableCell>
+        <TableCell>Tipo</TableCell>
+        <TableCell>Monto</TableCell>
+        <TableCell>Fecha</TableCell>
+      </TableRow>
+    </TableHead>
 
-    <ul>
+    <TableBody>
       {movimientos.map((mov) => (
-        <li key={mov.id}>
-          Cliente ID: {mov.clienteId} | Tipo: {mov.tipo} |
-          Monto: {mov.monto} | Fecha:{" "}
-          {new Date(mov.fecha).toLocaleString()}
-        </li>
+        <TableRow key={mov.id}>
+          <TableCell>{mov.clienteId}</TableCell>
+          <TableCell>{mov.tipo}</TableCell>
+          <TableCell>${mov.monto}</TableCell>
+          <TableCell>
+            {new Date(mov.fecha).toLocaleString()}
+          </TableCell>
+        </TableRow>
       ))}
-    </ul>
+    </TableBody>
+  </Table>
+</Paper>
 
     {/* ➕ FORMULARIO */}
    <Stack spacing={2} sx={{ mt: 3 }}>
@@ -150,14 +186,14 @@ function App() {
     onChange={(e) => setNuevoCupo(e.target.value)}
   />
 
-  <Button
-    variant="contained"
-    size="large"
-    sx={{ borderRadius: 3 }}
-    onClick={agregarCliente}
-  >
-    Agregar cliente
-  </Button>
+ <Button
+  variant="contained"
+  size="large"
+  fullWidth
+  sx={{ mt: 2, py: 1.2 }}
+>
+  Agregar cliente
+</Button>
 </Stack>
 
     {/* 👥 LISTA */}
