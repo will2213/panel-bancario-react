@@ -1,3 +1,15 @@
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Container,
+  Card,
+  CardContent,
+  Grid,
+  Stack,
+  TextField,
+  Button
+} from "@mui/material";
 import { useState } from "react";
 import ListaClientes from "./components/ListaClientes";
 
@@ -5,41 +17,158 @@ function App() {
   const [clientes, setClientes] = useState([
     { id: 1, nombre: "Juan Pérez", saldo: 1200 },
     { id: 2, nombre: "María Gómez", saldo: 800 },
+    { id: 3, nombre: "Carlos Rodríguez", saldo: 1500 },
   ]);
 
   const [nuevoNombre, setNuevoNombre] = useState("");
+  const [nuevoCupo, setNuevoCupo] = useState("");
+  const [movimientos, setMovimientos] = useState([]);
 
-  const agregarCliente = () => {
-    if (nuevoNombre.trim() === "") return;
+ const agregarCliente = () => {
+  if (nuevoNombre.trim() === "") return;
 
-    setClientes([
-      ...clientes,
+  setClientes([
+    ...clientes,
+    {
+      id: clientes.length + 1,
+      nombre: nuevoNombre,
+      saldo: Number(nuevoCupo) || 0,
+    },
+  ]);
+
+  // registrar movimiento inicial
+  if (Number(nuevoCupo) > 0) {
+    setMovimientos((prev) => [
+      ...prev,
       {
-        id: clientes.length + 1,
-        nombre: nuevoNombre,
-        saldo: 0,
+        id: prev.length + 1,
+        clienteId: clientes.length + 1,
+        tipo: "CUPO INICIAL",
+        monto: Number(nuevoCupo),
+        fecha: new Date().toISOString(),
       },
     ]);
+  }
 
-    setNuevoNombre("");
+  setNuevoNombre("");
+  setNuevoCupo("");
+};
+
+  const subirCupo = (idCliente) => {
+    if (nuevoCupo === "" || Number(nuevoCupo) <= 0) return;
+
+    setClientes((prev) =>
+      prev.map((cliente) =>
+        cliente.id === idCliente
+          ? { ...cliente, saldo: cliente.saldo + Number(nuevoCupo) }
+          : cliente
+      )
+    );
+
+    const nuevoMovimiento = {
+      id: movimientos.length + 1,
+      clienteId: idCliente,
+      tipo: "CUPO",
+      monto: Number(nuevoCupo),
+      fecha: new Date().toISOString(),
+    };
+
+    setMovimientos((prev) => [...prev, nuevoMovimiento]);
+    setNuevoCupo("");
   };
 
-  return (
-    <div>
-      <h1>Panel Bancario</h1>
+ return (
+  <Container maxWidth="md">
 
-      <input
-        type="text"
-        placeholder="Nombre del cliente"
-        value={nuevoNombre}
-        onChange={(e) => setNuevoNombre(e.target.value)}
-      />
+    {/* 🔵 BARRA SUPERIOR */}
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="h6">
+          Banco Demo
+        </Typography>
+      </Toolbar>
+    </AppBar>
 
-      <button onClick={agregarCliente}>Agregar cliente</button>
+    {/* 📊 TARJETAS RESUMEN */}
+    <Grid container spacing={2} sx={{ mt: 3 }}>
+      <Grid item xs={12} md={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="subtitle1">
+              Total clientes
+            </Typography>
+            <Typography variant="h4">
+              {clientes.length}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
 
-      <ListaClientes clientes={clientes} />
-    </div>
-  );
+      <Grid item xs={12} md={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="subtitle1">
+              Capital total
+            </Typography>
+            <Typography variant="h4">
+              ${clientes.reduce((acc, c) => acc + c.saldo, 0)}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+
+    {/* 🧾 HISTORIAL */}
+    <Typography variant="h5" sx={{ mt: 4 }}>
+      Historial de movimientos
+    </Typography>
+
+    <ul>
+      {movimientos.map((mov) => (
+        <li key={mov.id}>
+          Cliente ID: {mov.clienteId} | Tipo: {mov.tipo} |
+          Monto: {mov.monto} | Fecha:{" "}
+          {new Date(mov.fecha).toLocaleString()}
+        </li>
+      ))}
+    </ul>
+
+    {/* ➕ FORMULARIO */}
+   <Stack spacing={2} sx={{ mt: 3 }}>
+  <TextField
+    label="Nombre del cliente"
+    fullWidth
+    value={nuevoNombre}
+    onChange={(e) => setNuevoNombre(e.target.value)}
+  />
+
+  <TextField
+    label="Monto del cupo"
+    type="number"
+    fullWidth
+    value={nuevoCupo}
+    onChange={(e) => setNuevoCupo(e.target.value)}
+  />
+
+  <Button
+    variant="contained"
+    size="large"
+    sx={{ borderRadius: 3 }}
+    onClick={agregarCliente}
+  >
+    Agregar cliente
+  </Button>
+</Stack>
+
+    {/* 👥 LISTA */}
+    <ListaClientes
+      clientes={clientes}
+      subirCupo={subirCupo}
+    />
+
+  </Container>
+);
 }
 
 export default App;
+
