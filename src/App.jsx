@@ -154,18 +154,18 @@ function App() {
       </TableRow>
     </TableHead>
 
-    <TableBody>
-      {movimientos.map((mov) => (
-        <TableRow key={mov.id}>
-          <TableCell>{mov.clienteId}</TableCell>
-          <TableCell>{mov.tipo}</TableCell>
-          <TableCell>${mov.monto}</TableCell>
-          <TableCell>
-            {new Date(mov.fecha).toLocaleString()}
-          </TableCell>
-        </TableRow>
-      ))}
-    </TableBody>
+   <TableBody>
+  {movimientos.map((mov) => (
+    <TableRow key={mov.id}>
+      <TableCell>
+        {clientes.find((c) => c.id === mov.clienteId)?.nombre || "Desconocido"}
+      </TableCell>
+      <TableCell>{mov.tipo}</TableCell>
+      <TableCell>${mov.monto}</TableCell>
+      <TableCell>{new Date(mov.fecha).toLocaleString()}</TableCell>
+    </TableRow>
+  ))}
+</TableBody>
   </Table>
 </Paper>
 
@@ -191,7 +191,8 @@ function App() {
   size="large"
   fullWidth
   sx={{ mt: 2, py: 1.2 }}
->
+   onClick={agregarCliente}
+   >
   Agregar cliente
 </Button>
 </Stack>
